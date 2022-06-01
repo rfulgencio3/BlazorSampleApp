@@ -1,0 +1,43 @@
+﻿@page "/create"
+@using BlazorSampleApp.Data
+
+<h1>Create post "@_postToCreate.Title"</h1>
+
+<EditForm Model="_postToCreate" OnValidSubmit="CreatePost">
+    <div class="form-group mb-3">
+    <label for="postTitle">Title</label>
+    <InputText @bind-Value="_postToCreate.Title" class=form-control id="postTitle" />
+    </div>
+
+    <div class="form-group mb-3">
+    <label for="postDescription">Description</label>
+    <InputText @bind-Value="_postToCreate.Description" class=form-control id="postDescription" />
+    </div>
+
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <button class="btn btn-success" type="submit">Save</button>
+    <button @onclick="@(() => navigationManager.NavigateTo("/"))" class="btn btn-secondary">Cancel</button>
+
+</EditForm>
+
+@code
+{
+    [Inject] AppDbContext appDbContext { get; set; }
+    [Inject] NavigationManager navigationManager { get; set; }
+
+    private Post _postToCreate = new Post
+        {
+            Title = "Post title",
+            Description = "Post description"
+        };
+
+    private async Task CreatePost()
+    {
+        await appDbContext.Posts.AddAsync(_postToCreate);
+        await appDbContext.SaveChangesAsync();
+        navigationManager.NavigateTo("/");
+    }
+
+}
